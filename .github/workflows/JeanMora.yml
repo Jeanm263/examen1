@@ -41,8 +41,26 @@ jobs:
     - name: ✅ Image published successfully
       run: |
         echo "✅ Image pushed to ghcr.io/${{ env.REPO_LOWER }}:latest"
-        echo "📦 To deploy on server, run:"
-        echo "   cd ~/examen1"
-        echo "   git pull origin main"
-        echo "   docker pull ghcr.io/${{ env.REPO_LOWER }}:latest"
-        echo "   docker stack deploy -c stack.yml jeanmora"
+        echo "📦 Deploying to server..."
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: 🔐 Deploy to Server via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_SSH_PORT }}
+        script: |
+          echo "🚀 Starting deployment..."
+          cd ~/examen1
+          git pull origin main
+          docker pull ghcr.io/jeanm263/examen1:latest
+          docker stack deploy -c stack.yml jeanmora
+          echo "✅ Deployment completed!"
+          docker service ls
