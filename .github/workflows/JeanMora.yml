@@ -44,3 +44,44 @@ jobs:
         echo "📦 To deploy on server, run:"
         echo "   docker pull ghcr.io/${{ env.REPO_LOWER }}:latest"
         echo "   docker stack deploy -c stack.yml jeanmora"
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: 🧾 Mostrar variables básicas (solo locales, sin secretos)
+      run: |
+        echo "Probando conexión SSH con:"
+        echo "Host: ${{ secrets.VPS_HOST }}"
+        echo "Usuario: ${{ secrets.VPS_USER }}"
+        echo "Puerto: ${{ secrets.VPS_SSH_PORT }}"
+
+    - name: 🧪 Probar conexión SSH
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: ${{ secrets.VPS_SSH_PORT }}
+        script: |
+          echo "✅ Conexión exitosa desde GitHub Actions"
+          hostname
+          whoami
+          uptime
+
+    - name: 🚀 Deploy to Server
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: ${{ secrets.VPS_SSH_PORT }}
+        script: |
+          cd ~/examen1
+          git pull origin main
+          docker pull ghcr.io/jeanm263/examen1:latest
+          docker stack deploy -c stack.yml jeanmora
+          echo "✅ Deployment completed successfully!"
+          docker service ls
