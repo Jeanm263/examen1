@@ -40,26 +40,21 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
-    - name: 📥 Checkout repository
-      uses: actions/checkout@v4
-
-    - name: 🔐 Login to GitHub Container Registry
-      run: |
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-    - name: 📦 Pull latest image from GHCR
-      run: |
-        docker pull ghcr.io/jeanm263/examen1:latest
-
-    - name: 🚀 Deploy with Docker Stack
-      run: |
-        docker stack deploy -c stack.yml jeanmora
-
-    - name: ✅ Verify deployment
-      run: |
-        echo "Deployment completed!"
-        docker service ls
+    - name: 🚀 Deploy to Server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd ~/examen1
+          git pull origin main
+          docker login ghcr.io -u jeanm263 -p ${{ secrets.GHCR_PAT }}
+          docker pull ghcr.io/jeanm263/examen1:latest
+          docker stack deploy -c stack.yml jeanmora
+          echo "✅ Deployment completed successfully!"
+          docker service ls
