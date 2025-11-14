@@ -1,24 +1,13 @@
-# Imagen base oficial de Python
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar archivo de dependencias primero (para aprovechar cache de Docker)
 COPY requirements.txt .
 
-# Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar archivo de la aplicación
-COPY app.py .
+COPY . .
 
-# Crear usuario no-root para seguridad
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
-USER appuser
+EXPOSE 80
 
-# Exponer el puerto 5000
-EXPOSE 5000
-
-# Comando para ejecutar la aplicación
 CMD ["python", "app.py"]

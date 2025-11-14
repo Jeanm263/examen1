@@ -1,16 +1,14 @@
 from flask import Flask
-import os
 
 app = Flask(__name__)
 
 @app.route('/')
-def hello():
-    return "¡Hola Mundo desde Flask con CI/CD Automatizado! 🚀✅"
+def home():
+    return "<h1>Hola desde Flask con Traefik 🚀</h1>"
 
-@app.route('/health')
-def health():
-    return {"status": "healthy", "service": "Flask App"}
+@app.route('/saludo/<nombre>')
+def saludo(nombre):
+    return f"<h2>Hola {nombre}, bienvenido a pgmoreno.byronrm.com</h2>"
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=80)

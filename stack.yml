@@ -1,41 +1,27 @@
 version: "3.8"
 
 services:
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: ejemplo_db
-      TZ: America/New_York
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - db_net
+  jeanmora:
+    image: jeanmora:latest
+    build: .
     deploy:
       replicas: 1
-      restart_policy:
-        condition: on-failure
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
-      TZ: America/New_York
-    ports:
-      - "5050:80"
-    depends_on:
-      - postgres
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.jeanmora.entrypoints=http"
+        - "traefik.http.routers.jeanmora.rule=Host(`jeanmora.byronrm.com`)"
+        - "traefik.http.middlewares.jeanmora-https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.routers.jeanmora.middlewares=jeanmora-https-redirect"
+        - "traefik.http.routers.jeanmora-secure.entrypoints=https"
+        - "traefik.http.routers.jeanmora-secure.rule=Host(`jeanmora.byronrm.com`)"
+        - "traefik.http.routers.jeanmora-secure.tls=true"
+        - "traefik.http.routers.jeanmora-secure.tls.certresolver=http"
+        - "traefik.http.routers.jeanmora-secure.service=jeanmora"
+        - "traefik.http.services.jeanmora.loadbalancer.server.port=80"
+        - "traefik.docker.network=traefik-public"
     networks:
-      - db_net
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-
-volumes:
-  postgres_data:
+      - traefik-public
 
 networks:
-  db_net:
+  traefik-public:
+    external: true
