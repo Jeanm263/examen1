@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,23 +38,9 @@ jobs:
           ghcr.io/${{ env.REPO_LOWER }}:latest
           ghcr.io/${{ env.REPO_LOWER }}:${{ github.sha }}
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: 🚀 Deploy to Server
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd ~/examen1
-          git pull origin main
-          docker login ghcr.io -u jeanm263 -p ${{ secrets.GHCR_PAT }}
-          docker pull ghcr.io/jeanm263/examen1:latest
-          docker stack deploy -c stack.yml jeanmora
-          echo "✅ Deployment completed successfully!"
-          docker service ls
+    - name: ✅ Image published successfully
+      run: |
+        echo "✅ Image pushed to ghcr.io/${{ env.REPO_LOWER }}:latest"
+        echo "📦 To deploy on server, run:"
+        echo "   docker pull ghcr.io/${{ env.REPO_LOWER }}:latest"
+        echo "   docker stack deploy -c stack.yml jeanmora"
