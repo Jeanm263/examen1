@@ -64,13 +64,17 @@ jobs:
           echo "❌ ERROR: Configura VPS_USER en Settings → Secrets"
           exit 1
         fi
+        if [ -z "${{ secrets.VSP_SSH_PORT }}" ]; then
+          echo "❌ ERROR: Configura VSP_SSH_PORT en Settings → Secrets"
+          exit 1
+        fi
 
     - name: 🧾 Mostrar variables básicas (solo locales, sin secretos)
       run: |
         echo "Probando conexión SSH con:"
         echo "Host: ${{ secrets.VPS_HOST }}"
         echo "Usuario: ${{ secrets.VPS_USER }}"
-        echo "Puerto: ${{ secrets.VPS_SSH_PORT || '22' }}"
+        echo "Puerto: ${{ secrets.VSP_SSH_PORT || '22' }}"
 
     - name: 🧪 Probar conexión SSH
       uses: appleboy/ssh-action@v1
@@ -79,7 +83,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
         password: ${{ secrets.VPS_PASSWORD }}
-        port: ${{ secrets.VPS_SSH_PORT || '22' }}
+        port: ${{ secrets.VSP_SSH_PORT || '22' }}
         script: |
           echo "✅ Conexión exitosa desde GitHub Actions"
           hostname
@@ -93,7 +97,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
         password: ${{ secrets.VPS_PASSWORD }}
-        port: ${{ secrets.VPS_SSH_PORT || '22' }}
+        port: ${{ secrets.VSP_SSH_PORT || '22' }}
         script: |
           echo "🚀 Starting deployment..."
           cd ~/examen1
