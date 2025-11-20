@@ -15,6 +15,12 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     system_info = get_system_info()
+    # Leer versión del archivo VERSION
+    try:
+        with open('VERSION', 'r') as f:
+            version_info = f.read().strip()
+    except:
+        version_info = 'Versión 4.0'
     return f"""
     <html>
         <head>
@@ -30,7 +36,7 @@ def home():
         <body>
             <div class="container">
                 <h1>🚀 Hola desde Flask con Traefik y CI/CD automático</h1>
-                <p class="version">Versión 4.0 - Despliegue Automático</p>
+                <p class="version">{version_info}</p>
                 <div class="info">
                     <h3>📊 Información del Sistema:</h3>
                     <p><strong>Hostname:</strong> {system_info['hostname']}</p>
