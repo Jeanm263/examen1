@@ -62,7 +62,7 @@ jobs:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
-        port: ${{ secrets.VPS_SSH_PORT }}
+        port: ${{ secrets.VSP_SSH_PORT }}
         script: |
           echo "✅ Conexión exitosa desde GitHub Actions"
           hostname
@@ -75,7 +75,7 @@ jobs:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
-        port: ${{ secrets.VPS_SSH_PORT }}
+        port: ${{ secrets.VSP_SSH_PORT }}
         script: |
           echo "🚀 Starting deployment..."
           cd ~/examen1
