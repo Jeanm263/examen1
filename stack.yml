@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   jeanmora:
-    image: ghcr.io/jeanm263/examen1:latest
+    image: ghcr.io/jeanm263/examen1:28c60155d7b373ebcc580bda2513716c5c76fe69
     build: .
     deploy:
       replicas: 1
